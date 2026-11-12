@@ -1,0 +1,28 @@
+# Signed builds and release files
+*.apk
+*.apks
+*.idsig
+out/
+release/
+
+# Signing material
+*.jks
+*.keystore
+*.pass
+keys/
+
+# Original app, decompiled or extracted code, build trees
+work/
+extract/
+jadx*/
+rea-out/
+strings/
+smali*/
+*.dex
+tools/
+
+# Not published: embeds the original app's key
+scripts/AuthorNotice.java
+
+__pycache__/
+*.pyc
