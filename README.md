@@ -28,13 +28,13 @@ translations, and per-device lens profiles. Ready-made APKs are on the
 | Notification fix: "Perfect M9 · background rendering" no longer stays at 100% forever. The final notice auto-cancels after 4 s; failure notices stay | `fixes_patch.py` |
 | Telemetry off: OneTrack analytics (its own kill switch), camera cloud-config requests, and the watermark network-time probe (HEAD to baidu.com / google.com / yandex.com) now use the device clock. Measured on gauguin: 0 bytes of network traffic for the app over a launch plus 3 shots | `fixes_patch.py` |
 | iQOO builds: style nets run on the HTP V79 DSP of Snapdragon 8 Elite using the V79 runtime already inside the APK | `iqoo_patch.py` |
-| Slim build (gauguin): drops models and DSP files a phone without HTP cannot use, 532 MB to 422 MB | `slim_patch.py` |
+| Slim build (gauguin): drops models and DSP files a phone without HTP cannot use, 525 MB to 422 MB | `slim_patch.py` |
 
 ## Supported phones
 
 | Status | Phones | Build | Evidence |
 |---|---|---|---|
-| **Tested** | Xiaomi Mi 10T Lite 5G / Redmi Note 9 Pro 5G / Mi 10i (`gauguin`, SM7225) on LineageOS 24 | `leica-gauguin-en-slim.apk` (the tested build) | Photos at 1x, 0.6x, 2x; Pro manual ISO/shutter/WB; M9, M9+, M10-R and film styles; Styles editor; watermark; lens switch 15/15 without freeze; no network traffic |
+| **Tested** | Xiaomi Mi 10T Lite 5G / Redmi Note 9 Pro 5G / Mi 10i (`gauguin`, SM7225) on LineageOS 24 | `leica-gauguin-en-slim.apk`, `leica-gauguin-en.apk` (full) | Photos at 1x, 0.6x, 2x; Pro manual ISO/shutter/WB; M9, M9+, M10-R and film styles; Styles editor; watermark; lens switch 15/15 without freeze; no network traffic |
 | **Built, not tested** | vivo iQOO 13 (V2408A, V2408, I2401) | `leica-iqoo13-en.apk` | Static checks only (signature, alignment, manifest, profile JSON). Not yet run on a phone |
 | **Built, not tested** | vivo iQOO Neo 11 (V2520A) | `leica-iqooneo11-en.apk` | Static checks only. Not yet run on a phone |
 | **Profile in the app, untested** | 261 OPPO, vivo, Redmi and Xiaomi models listed in [device-profiles.md](device-profiles.md) | Any build; the app auto-selects the profile by model code | Profiles come from manufacturer specs in the original app. Nobody in this project has tried them |
@@ -42,10 +42,10 @@ translations, and per-device lens profiles. Ready-made APKs are on the
 
 Notes:
 
-- `leica-gauguin-en.apk` is the first gauguin build (English UI, gauguin profile,
-  auto-detect, 2x chip, all DSP files). It predates the film styles and the lens-switch,
-  Styles-entry, tone-picker, notification and telemetry fixes. Prefer the slim build on
-  gauguin.
+- `leica-gauguin-en.apk` is the full gauguin build: the same fixes and film styles as the
+  slim build, plus every model and DSP file (525 MB). Tested on gauguin (photos at
+  0.6x/1x/2x, film styles, no crash, no notification). The slim build is smaller and is
+  enough for gauguin.
 - Every build contains the 261 built-in profiles plus the profile of its own target phone
   (gauguin, iQOO 13 or iQOO Neo 11). The gauguin slim build lacks the DSP files that HTP phones use, so on a
   Snapdragon 8 Elite phone use an iQOO build.
