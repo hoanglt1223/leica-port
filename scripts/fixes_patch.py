@@ -11,6 +11,7 @@
 4. Background rendering: the final "rendering done" notification no longer stays forever.
 5. Telemetry off: OneTrack kill switch on (classes2), camera CloudConfig network fetch stubbed (classes3),
    watermark network-time probe (baidu/google/yandex HEAD) replaced by the device clock (classes4).
+6. MonoGuard: mono sensors and logical cameras built on them are never lens routes (classes28).
 """
 import os, re, shutil, sys
 
@@ -216,14 +217,37 @@ def net_time_off(root):
     open(path, 'w', encoding='utf-8', newline='\n').write(src[:m.start()] + NET_TIME + src[m.end():])
 
 
+CATALOG = 'Lcom/codex/rearlens/CameraCatalog;'
+GUARD = 'Lcom/codex/rearlens/MonoGuard;'
+
+
+def mono_guard(root):
+    # Mono sensors (MONO/NIR colour filter) and logical cameras built on them never become lens routes.
+    path = os.path.join(root, 'classes28/com/codex/rearlens/CameraCatalog.smali')
+    method(path, 'static color(Landroid/hardware/camera2/CameraCharacteristics;)Z', [
+        ('    :cond_8\n',
+         f'    :cond_8\n    invoke-static {{p0}}, {GUARD}->excluded(Landroid/hardware/camera2/CameraCharacteristics;)Z\n\n'
+         '    move-result v0\n\n    if-eqz v0, :color_ok\n\n    return v1\n\n    :color_ok\n')])
+    method(path, f'public static scan(Landroid/hardware/camera2/CameraManager;){CATALOG}', [
+        (f'    invoke-static {{v0, p0}}, Lcom/codex/rearlens/Discovery;->beforeBuild({CATALOG}Landroid/hardware/camera2/CameraManager;)V\n',
+         f'    iget-object v1, v0, {CATALOG}->info:Ljava/util/Map;\n\n'
+         f'    iget-object v2, v0, {CATALOG}->openIds:Ljava/util/Set;\n\n'
+         f'    iget-object v3, v0, {CATALOG}->publicIds:Ljava/util/Set;\n\n'
+         f'    iget-object v4, v0, {CATALOG}->parents:Ljava/util/Map;\n\n'
+         f'    invoke-static {{v1, v2, v3, v4}}, {GUARD}->prune(Ljava/util/Map;Ljava/util/Set;Ljava/util/Set;Ljava/util/Map;)V\n\n'
+         f'    invoke-static {{v0, p0}}, Lcom/codex/rearlens/Discovery;->beforeBuild({CATALOG}Landroid/hardware/camera2/CameraManager;)V\n')])
+
+
 def main(root, classes3, java_smali):
-    for rel, dex in (('com/codex/filmlut', 'classes24'), ('com/codex/rearlens/MethodCache.smali', 'classes25')):
+    for rel, dex in (('com/codex/filmlut', 'classes24'), ('com/codex/rearlens/MethodCache.smali', 'classes25'),
+                     ('com/codex/rearlens/MonoGuard.smali', 'classes28')):
         src, dst = os.path.join(java_smali, rel), os.path.join(root, dex, rel)
         if os.path.isdir(src):
             shutil.copytree(src, dst, dirs_exist_ok=True)
         else:
             shutil.copy(src, dst)
     rearlens(root)
+    mono_guard(root)
     mode_entry(classes3)
     film_styles(root)
     drained_notice(root)

@@ -37,6 +37,18 @@ AUTO_DETECT_NEW = f"""    :goto_93
     const/4 p0, 0x1
 """
 
+# The dialog's "Auto detect" button cleared the profile, leaving the raw camera list (duplicate
+# ultrawide id 6 and the macro as extra 0.6/0.9 stops). Apply the profile matching this phone instead;
+# phones with no catalog match still get the raw list.
+AUTO_BUTTON_OLD = """    const/4 p1, 0x0
+
+    # invokes: Lcom/codex/modelmatch/ProfileUi;->apply"""
+AUTO_BUTTON_NEW = f"""    invoke-static {{}}, {PROFILES}->detected(){PROFILE}
+
+    move-result-object p1
+
+    # invokes: Lcom/codex/modelmatch/ProfileUi;->apply"""
+
 # The QNN/HTP experiment screen cannot load its DSP graph on SM7225; hide its entry button.
 EXPERIMENT_OLD = """    invoke-virtual {v13, v0}, Landroid/widget/Button;->setText(Ljava/lang/CharSequence;)V
 """
@@ -106,6 +118,7 @@ def patch(path, old, new):
 def main(root, json_in, json_out, arsc_in, arsc_out, profile='gauguin-profile.json'):
     arsc_strings.apply_cmd(arsc_in, os.path.join(HERE, 'arsc-translations-en.json'), arsc_out)
     patch(os.path.join(root, 'classes30/com/codex/modelmatch/Profiles.smali'), AUTO_DETECT_OLD, AUTO_DETECT_NEW)
+    patch(os.path.join(root, 'classes30/com/codex/modelmatch/ProfileUi$5.smali'), AUTO_BUTTON_OLD, AUTO_BUTTON_NEW)
     patch(os.path.join(root, 'classes11/com/codex/leicaapp/LeicaV43Ui.smali'), EXPERIMENT_OLD, EXPERIMENT_NEW)
     patch(os.path.join(root, 'classes30/com/codex/rearlens/ProfileRouter.smali'), CROP_STOP_OLD, CROP_STOP_NEW)
     smali_strings.apply(root, os.path.join(HERE, 'translations-en.json'))

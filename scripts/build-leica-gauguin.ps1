@@ -18,7 +18,7 @@ $work = Join-Path $root 'work\build'
 $outDir = Join-Path $root 'out'
 $keys = Join-Path $root 'keys'
 $bt = Get-ChildItem "$env:LOCALAPPDATA\Android\Sdk\build-tools" | Sort-Object Name | Select-Object -Last 1 -ExpandProperty FullName
-$dexes = 2, 4, 11, 15, 17, 19, 22, 23, 24, 25, 26, 29, 30, 31
+$dexes = 2, 4, 11, 15, 17, 19, 22, 23, 24, 25, 26, 28, 29, 30, 31
 
 function Run($exe, [string[]]$a) { & $exe @a; if ($LASTEXITCODE) { throw "$exe failed ($LASTEXITCODE)" } }
 
